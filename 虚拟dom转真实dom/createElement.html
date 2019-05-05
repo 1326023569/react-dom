@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    let oUl = {
+        tagName: 'ul',
+        props: {
+            className: 'list'
+        },
+        children: [{
+            tagName: 'li',
+            props: null,
+            children: ['1']
+        }, {
+            tagName: 'li',
+            props: null,
+            children: ['2']
+        }]
+    };
+    let vTree = {
+        tagName: 'div',
+        props: {
+            id: 'all',
+            style: {
+                color: 'red',
+                background: 'blue',
+            }
+        },
+        children: ['序号', oUl, {
+            tagName: 'p',
+            props: null,
+            children: ['helloworld']
+        }]
+    };
+
+    function createElement(vTree) {
+        let {
+            tagName,
+            props,
+            children
+        } = vTree; //对象解构
+        console.log(children)
+        let realDom = document.createElement(tagName);
+        if (props) {
+            Object.keys(props).forEach((propsName) => {
+                if (propsName === 'style') {
+                    Object.keys(props[propsName]).forEach(styleName => {
+                        realDom.style[styleName] = props[propsName][styleName]; //样式的转换
+                    })
+                } else {
+                    realDom.setAttribute(propsName, props[propsName]); //dom添加属性
+                }
+            });
+        }
+        children.forEach(item => {
+            if (typeof item === 'string') {
+                let text = document.createTextNode(item); //创建文本节点
+                realDom.appendChild(text);
+            } else {
+                realDom.appendChild(createElement(item)); //递归解决dom树的嵌套虚拟dom
+            }
+        })
+        return realDom; //返回值
+    }
+    let realDom = createElement(vTree)
+    document.body.appendChild(realDom)
+</script>
+
+</html>
